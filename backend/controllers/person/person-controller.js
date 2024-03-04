@@ -13,7 +13,7 @@ class PersonController extends BaseController {
         this.detail = this.detail.bind(this);
         this.create = this.create.bind(this);
         this.update = this.update.bind(this);
-        this.del = this.del.bind(this);
+
     }
 
 
