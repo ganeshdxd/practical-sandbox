@@ -1,69 +1,82 @@
-"use strict";
+"use strict"
 
-const BaseCore = require("../../../core/base-core");
-const PersonEntity = require("../../entities/mongodb/person-entity"); 
-
+const BaseCore = require("../../../core/base-core")
+const PersonEntity = require("../../entities/mongodb/person-entity")
 
 class PersonComponent extends BaseCore {
-    constructor() {
-        super();
+  constructor() {
+    super()
 
-        this._personEntity = new PersonEntity;
+    this._personEntity = new PersonEntity()
+  }
+
+  async getListPerson() {
+    let persons = await this._personEntity.list()
+    return persons
+  }
+
+  async getDetailPerson(id) {
+    if (!id) {
+      throw {
+        message: "Invalid input",
+      }
     }
 
-    async getListPerson() {
+    let person = await this._personEntity.findById(id)
+    return person
+  }
 
-        let persons = await this._personEntity.list();
-        return persons;
+  async updatePerson(id, person) {
+    if (!person) {
+      throw {
+        message: "Invalid input",
+      }
     }
 
+    let result = await this._personEntity.update(id, person)
 
-    async getDetailPerson(id) {
-        if (!id) {
-            throw {
-                message: "Invalid input"
-            }
-        }
-
-        let person = await this._personEntity.findById(id);
-        return person;
+    if (!result) {
+      throw {
+        message: "An occurs err",
+      }
     }
 
-    async updatePerson(id, person) {
-        if (!person) {
-            throw {
-                message: "Invalid input"
-            }
-        }
-
-        let result = await this._personEntity.update(id, person);
-
-        if (!result) {
-            throw {
-                message: "An occurs err"
-            }
-        }
-
-        return result;
-    }
-    async addPerson(person) {
-        if (!person) {
-            throw {
-                message: "Invalid input"
-            }
-        }
-
-        let result = await this._personEntity.add(person);
-
-        if (!result) {
-            throw {
-                message: "An occurs err"
-            }
-        }
-
-        return result;
+    return result
+  }
+  async addPerson(person) {
+    if (!person) {
+      throw {
+        message: "Invalid input",
+      }
     }
 
+    let result = await this._personEntity.add(person)
+
+    if (!result) {
+      throw {
+        message: "An occurs err",
+      }
+    }
+
+    return result
+  }
+  async deletePerson(id) {
+    if (!id) {
+      throw {
+        message: "Invalid input",
+      }
+    }
+
+    let result = await this._personEntity.remove(id)
+
+    if (!result) {
+      throw {
+        message: "An occurs err",
+      }
+    }
+
+    return result
+  }
 }
 
-module.exports = PersonComponent;
+module.exports = PersonComponent

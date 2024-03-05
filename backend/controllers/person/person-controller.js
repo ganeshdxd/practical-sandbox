@@ -1,97 +1,111 @@
-"use strict";
-const axios = require("axios");
+"use strict"
+const axios = require("axios")
 
-const BaseController = require("../../core/base-controller");
-
+const BaseController = require("../../core/base-controller")
 
 class PersonController extends BaseController {
+  constructor() {
+    super()
 
-    constructor() {
-        super();
+    this.list = this.list.bind(this)
+    this.detail = this.detail.bind(this)
+    this.create = this.create.bind(this)
+    this.update = this.update.bind(this)
+    this.delete = this.delete.bind(this)
+  }
 
-        this.list = this.list.bind(this);
-        this.detail = this.detail.bind(this);
-        this.create = this.create.bind(this);
-        this.update = this.update.bind(this);
-
+  async list(req, res) {
+    try {
+      let data = await this._facade.getListPerson()
+      return this._handleResult(data, res)
+    } catch (error) {
+      res.render("err/occurs-error", {
+        layout: false,
+        err: error,
+      })
     }
+  }
 
+  async detail(req, res) {
+    try {
+      let id = req.params.id.trim()
+      let data = await this._facade.getDetailPerson(id)
 
-    async list(req, res) {
-
-        try {
-            let data = await this._facade.getListPerson();
-            return this._handleResult(data, res);
-
-        } catch (error) {
-            res.render('err/occurs-error', {
-                layout: false,
-                err: error
-            });
-        }
-
+      return this._handleResult(data, res)
+    } catch (error) {
+      this._handleError(error.message, res)
     }
+  }
 
-    async detail(req, res) {
-        try {
-            let id = req.params.id.trim();
-            let data = await this._facade.getDetailPerson(id);
+  async create(req, res) {
+    try {
+      if (this._handleValidationResult(req, res)) {
+        return false
+      }
 
-            return this._handleResult(data, res);
+      let person = {
+        fullname: req.body.FullName,
+        address: req.body.Address,
+        age: Number(req.body.Age),
+      }
 
+      let data = await this._facade.addPerson(person)
 
-        } catch (error) {
-            this._handleError(error.message, res);
-        }
+      this._handleResult(data, res)
+    } catch (error) {
+      console.log(error)
+      this._handleError(
+        {
+          code: 500,
+          message: error.message,
+        },
+        res
+      )
     }
-
-    async create(req, res) {
-        try {
-            if (this._handleValidationResult(req, res)) {
-                return false;
-            }
-
-            let person = {
-                fullname: req.body.FullName,
-                address: req.body.Address,
-                age: Number(req.body.Age),
-            };
- 
-            let data = await this._facade.addPerson(person);
-
-            this._handleResult(data, res);
-        } catch (error) {
-            console.log(error);
-            this._handleError({
-                code: 500,
-                message: error.message
-            }, res);
-        }
+  }
+  async delete(req, res) {
+    console.log("server: delete called")
+    try {
+      if (this._handleValidationResult(req, res)) {
+        return false
+      }
+      console.log("req.params", req.params)
+      let id = req.params.id.trim()
+      let data = await this._facade.deletePerson(id)
+      this._handleResult(data, res)
+    } catch (error) {
+      console.log(error)
+      this._handleError(
+        {
+          code: 500,
+          message: error.message,
+        },
+        res
+      )
     }
+  }
 
-    async update(req, res) {
-        try {
-            if (this._handleValidationResult(req, res)) {
-                return false;
-            }
-            console.log(req.body.Id);
+  async update(req, res) {
+    try {
+      if (this._handleValidationResult(req, res)) {
+        return false
+      }
+      console.log(req.body.Id)
 
+      let person = {
+        id: req.body.Id,
+        fullname: req.body.FullName,
+        address: req.body.Address,
+        age: Number(req.body.Age),
+      }
 
-            let person = {
-                id: req.body.Id,
-                fullname: req.body.FullName,
-                address: req.body.Address,
-                age: Number(req.body.Age),
-            };
+      let data = await this._facade.updatePerson(person.id, person)
 
-            let data = await this._facade.updatePerson(person.id, person);
-
-            this._handleResult(data, res);
-        } catch (error) {
-            this._handleError(error.message, res);
-        }
+      this._handleResult(data, res)
+    } catch (error) {
+      this._handleError(error.message, res)
     }
-
+  }
 }
 
-module.exports = PersonController;
+module.exports = PersonController
